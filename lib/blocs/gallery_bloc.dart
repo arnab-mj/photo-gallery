@@ -26,5 +26,7 @@ class GalleryBloc extends BaseBloc {
   }
 
   @override
-  void dispose() {}
+  void dispose() {
+    _scPhotosList.close();
+  }
 }
