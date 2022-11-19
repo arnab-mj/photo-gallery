@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:photo_gallery/utils/styles.dart';
+import 'package:photo_gallery/views/splash_screen/splash_screen.dart';
 
 void main() {
   runApp(const PhotoGallery());
@@ -9,9 +11,12 @@ class PhotoGallery extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'Photo Gallery',
-      home: Scaffold(),
+      theme: Styles.darkTheme(),
+      routes: {
+        '/': (context) => const SplashScreen(),
+      },
     );
   }
 }
