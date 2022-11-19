@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // hexSting format #FFFFFF
@@ -31,4 +34,14 @@ Map<int, Color> getColorSwatch(Color color) {
     800: Color.fromRGBO(color.red, color.green, color.blue, .9),
     900: Color.fromRGBO(color.red, color.green, color.blue, 1),
   };
+}
+
+Widget showLoader(BuildContext context) {
+  return Platform.isIOS
+      ? CupertinoActivityIndicator(
+          color: Theme.of(context).colorScheme.secondary,
+        )
+      : CircularProgressIndicator(
+          color: Theme.of(context).colorScheme.secondary,
+        );
 }

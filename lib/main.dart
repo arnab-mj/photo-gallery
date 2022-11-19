@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:photo_gallery/utils/styles.dart';
+import 'package:photo_gallery/views/gallery_screen/gallery_screen.dart';
 import 'package:photo_gallery/views/splash_screen/splash_screen.dart';
 
 void main() {
@@ -16,6 +17,7 @@ class PhotoGallery extends StatelessWidget {
       theme: Styles.darkTheme(),
       routes: {
         '/': (context) => const SplashScreen(),
+        GalleryScreen.routeName: (context) => const GalleryScreen(),
       },
     );
   }

@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:photo_gallery/utils/app_constant.dart';
+import 'package:photo_gallery/views/gallery_screen/gallery_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -12,6 +15,10 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+
+    Timer(const Duration(seconds: 2), () {
+      initializeApp();
+    });
   }
 
   @override
@@ -42,5 +49,9 @@ class _SplashScreenState extends State<SplashScreen> {
         ],
       ),
     );
+  }
+
+  void initializeApp() {
+    Navigator.pushReplacementNamed(context, GalleryScreen.routeName);
   }
 }

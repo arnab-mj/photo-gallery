@@ -4,10 +4,14 @@ import 'package:photo_gallery/utils/utility.dart';
 class Styles {
   static ThemeData darkTheme() {
     return ThemeData(
-      primarySwatch: MaterialColor(
-        parseColorInt('#000000'),
-        getColorSwatch(parseColor('#000000')),
+      colorScheme: ColorScheme.fromSwatch(
+        primarySwatch: MaterialColor(
+          parseColorInt('#000000'),
+          getColorSwatch(parseColor('#000000')),
+        ),
+        accentColor: const Color(0xFFFFFFFF),
       ),
+      scaffoldBackgroundColor: const Color(0xFF000000),
       visualDensity: VisualDensity.adaptivePlatformDensity,
     );
   }
