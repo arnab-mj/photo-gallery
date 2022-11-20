@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 
-class PhotoPreviewActionButton extends StatelessWidget {
+class PhotoPreviewActionButton extends StatefulWidget {
   final IconData iconData;
   final Function onPressed;
 
   const PhotoPreviewActionButton({super.key, required this.iconData, required this.onPressed});
 
+  @override
+  State<PhotoPreviewActionButton> createState() => _PhotoPreviewActionButtonState();
+}
+
+class _PhotoPreviewActionButtonState extends State<PhotoPreviewActionButton> {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
@@ -14,9 +19,9 @@ class PhotoPreviewActionButton extends StatelessWidget {
         backgroundColor: MaterialStateProperty.all<Color?>(Colors.grey[800]),
       ),
       child: Icon(
-        iconData,
+        widget.iconData,
       ),
-      onPressed: () => onPressed(),
+      onPressed: () => widget.onPressed(),
     );
   }
 }
