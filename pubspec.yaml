@@ -19,11 +19,15 @@ dependencies:
   permission_handler: ^10.2.0
   share_plus: ^6.3.0
   flutter_wallpaper_manager: ^0.0.3
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+  hive_generator: ^2.0.0
+  build_runner: ^2.3.2
 
 flutter:
   uses-material-design: true

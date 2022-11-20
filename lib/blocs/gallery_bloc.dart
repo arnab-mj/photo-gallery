@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:photo_gallery/blocs/base_bloc.dart';
 import 'package:photo_gallery/models/photos_list_response.dart';
 import 'package:photo_gallery/network/api_base_helper.dart';
 import 'package:photo_gallery/network/api_response.dart';
 import 'package:photo_gallery/repositories/photos_repository.dart';
+import 'package:photo_gallery/utils/app_hive.dart';
 
 class GalleryBloc extends BaseBloc {
   final PhotosRepository _repo = PhotosRepository();
@@ -26,7 +28,7 @@ class GalleryBloc extends BaseBloc {
   List<Photo> get photoList => _photoList;
 
   int pageNumber = 1;
-  bool hasNextPage = false;
+  bool hasNextPage = true;
 
   GalleryBloc() {
     _scrollController.addListener(() {
@@ -36,29 +38,51 @@ class GalleryBloc extends BaseBloc {
     });
   }
 
-  void getPhotoList(StreamSink<ApiResponse<List<Photo>>> sink) async {
+  void getPhotoList(StreamSink<ApiResponse<List<Photo>>> sink, [bool checkDB = false]) async {
     sink.add(ApiResponse.loading());
 
     try {
-      final Response<List<Photo>> response = await _repo.getPhotosList(pageNumber);
+      var photoListBox = await Hive.openBox<Photo>(AppHive.photoListBox);
+      var photoGalleryBox = await Hive.openBox(AppHive.photoGalleryBox);
 
-      _photoList.addAll(response.body);
+      if (checkDB && photoListBox.values.isNotEmpty) {
+        _photoList.addAll(photoListBox.values);
 
-      sink.add(ApiResponse.completed(response.body));
+        hasNextPage = photoGalleryBox.get(AppHive.hasNextPageKey);
+        pageNumber = photoGalleryBox.get(AppHive.nextPageNumberKey);
 
-      if (response.headers['link'].toString().contains('rel="next"')) {
-        hasNextPage = true;
-        pageNumber++;
-      } else {
-        hasNextPage = false;
+        sink.add(ApiResponse.completed(null));
+
+        return;
       }
+
+      if (hasNextPage) {
+        final Response<List<Photo>> response = await _repo.getPhotosList(pageNumber);
+
+        if (response.headers['link'].toString().contains('rel="next"')) {
+          hasNextPage = true;
+          pageNumber++;
+        } else {
+          hasNextPage = false;
+        }
+
+        _photoList.addAll(response.body);
+
+        // Store information to DB
+        photoListBox.addAll(response.body);
+
+        photoGalleryBox.put(AppHive.nextPageNumberKey, pageNumber);
+        photoGalleryBox.put(AppHive.hasNextPageKey, hasNextPage);
+      }
+
+      sink.add(ApiResponse.completed(null));
     } catch (e) {
       sink.add(ApiResponse.error(e.toString()));
     }
   }
 
   void getInitialPhotosList() async {
-    getPhotoList(photosListSink);
+    getPhotoList(photosListSink, true);
   }
 
   void requestNextPage() async {
@@ -70,5 +94,6 @@ class GalleryBloc extends BaseBloc {
     _scPhotosList.close();
     _scRequestNextPage.close();
     _scrollController.dispose();
+    Hive.close();
   }
 }

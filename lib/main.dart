@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:photo_gallery/models/photos_list_response.dart';
 import 'package:photo_gallery/utils/styles.dart';
 import 'package:photo_gallery/views/gallery_screen/gallery_screen.dart';
 import 'package:photo_gallery/views/photo_preview_screen/photo_preview_screen.dart';
 import 'package:photo_gallery/views/splash_screen/splash_screen.dart';
 
-void main() {
+void main() async {
+  await Hive.initFlutter();
+  Hive.registerAdapter(PhotoAdapter());
+  
   runApp(const PhotoGallery());
 }
 

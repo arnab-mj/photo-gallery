@@ -1,13 +1,23 @@
 import 'dart:convert';
+import 'package:hive/hive.dart';
+
+part 'photos_list_response.g.dart';
 
 List<Photo> photoListFromJson(String str) => List<Photo>.from(json.decode(str).map((x) => Photo.fromJson(x)));
 
+@HiveType(typeId: 0)
 class Photo {
+  @HiveField(0)
   String? id;
+  @HiveField(1)
   String? author;
+  @HiveField(2)
   int? width;
+  @HiveField(3)
   int? height;
+  @HiveField(4)
   String? url;
+  @HiveField(5)
   String? downloadUrl;
 
   Photo({
