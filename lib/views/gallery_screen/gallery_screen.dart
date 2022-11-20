@@ -10,6 +10,7 @@ import 'package:photo_gallery/network/api_response.dart';
 import 'package:photo_gallery/utils/app_constant.dart';
 import 'package:photo_gallery/utils/utility.dart';
 import 'package:photo_gallery/views/gallery_screen/widgets/gallery_image_box.dart';
+import 'package:photo_gallery/views/photo_preview_screen/photo_preview_screen.dart';
 import 'package:photo_gallery/widgets/cached_image.dart';
 import 'package:photo_gallery/widgets/error.dart';
 
@@ -45,7 +46,12 @@ class _GalleryScreenState extends State<GalleryScreen> {
     return GridView.builder(
       controller: _scrollController,
       itemBuilder: (context, index) {
-        return GalleryImageBox(photo: photosList![index]);
+        return InkWell(
+          onTap: () {
+            Navigator.pushNamed(context, PhotoPreviewScreen.routeName, arguments: PhotoPreviewScreenArgs(photoList: _bloc.photoList, index: index));
+          },
+          child: GalleryImageBox(photo: _bloc.photoList[index]),
+        );
       },
       itemCount: photosList?.length ?? 0,
       primary: false,
