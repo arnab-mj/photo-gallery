@@ -43,9 +43,14 @@ Widget showLoader(BuildContext context) {
       ? CupertinoActivityIndicator(
           color: Theme.of(context).colorScheme.secondary,
         )
-      : CircularProgressIndicator(
-          color: Theme.of(context).colorScheme.secondary,
-        );
+      : SizedBox(
+        width: 16,
+        height: 16,
+        child: CircularProgressIndicator(
+            strokeWidth: 1.5,
+            color: Theme.of(context).colorScheme.secondary,
+          ),
+      );
 }
 
 Future<String> saveFileToDisk(FileResponse response) async {
@@ -79,7 +84,7 @@ Future<String> saveFileToDisk(FileResponse response) async {
   return filePath;
 }
 
-showSnackBar(BuildContext context, String? message, bool isError) {
+showSnackBar(BuildContext context, String? message, [bool isError = false]) {
   if (message == null || message.isEmpty) return;
 
   ScaffoldMessenger.of(context).hideCurrentSnackBar();

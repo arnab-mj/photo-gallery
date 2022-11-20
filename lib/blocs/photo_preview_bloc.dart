@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import 'package:photo_gallery/blocs/base_bloc.dart';
+import 'package:photo_gallery/models/wallpaper.dart';
 import 'package:photo_gallery/network/api_response.dart';
 import 'package:photo_gallery/repositories/photos_repository.dart';
 import 'package:photo_gallery/utils/app_permission_handler.dart';
@@ -8,13 +10,13 @@ import 'package:share_plus/share_plus.dart';
 
 class PhotoPreviewBloc extends BaseBloc {
   final PhotosRepository _repo = PhotosRepository();
-  final StreamController<ApiResponse<dynamic>> _scphotoShare = StreamController<ApiResponse<dynamic>>();
+  final StreamController<ApiResponse<dynamic>> _scLoader = StreamController<ApiResponse<dynamic>>();
 
-  StreamSink<ApiResponse<dynamic>> get photoShareSink => _scphotoShare.sink;
-  Stream<ApiResponse<dynamic>> get photoShareStream => _scphotoShare.stream;
+  StreamSink<ApiResponse<dynamic>> get loaderSink => _scLoader.sink;
+  Stream<ApiResponse<dynamic>> get loaderStream => _scLoader.stream;
 
   void sharePhoto(String downloadUrl) async {
-    photoShareSink.add(ApiResponse.loading());
+    loaderSink.add(ApiResponse.loading());
 
     try {
       if (await AppPermissionHandler().hasStoragePermission()) {
@@ -24,14 +26,33 @@ class PhotoPreviewBloc extends BaseBloc {
         throw ('Storage permission denied.');
       }
 
-      photoShareSink.add(ApiResponse.completed({}));
+      loaderSink.add(ApiResponse.completed({}));
     } catch (e) {
-      photoShareSink.add(ApiResponse.error(e.toString()));
+      loaderSink.add(ApiResponse.error(e.toString()));
+    }
+  }
+
+  void setWallpaper(String downloadUrl, WallpaperMode wallpaperMode) async {
+    loaderSink.add(ApiResponse.loading());
+
+    try {
+      String response;
+      if (await AppPermissionHandler().hasStoragePermission()) {
+        response = await _repo.getPhoto(downloadUrl);
+
+        await WallpaperManager.setWallpaperFromFile(response, wallpaperMode.value);
+      } else {
+        throw ('Storage permission denied.');
+      }
+
+      loaderSink.add(ApiResponse.completed('Wallpaper applied successfully.'));
+    } catch (e) {
+      loaderSink.add(ApiResponse.error(e.toString()));
     }
   }
 
   @override
   void dispose() {
-    _scphotoShare.close();
+    _scLoader.close();
   }
 }

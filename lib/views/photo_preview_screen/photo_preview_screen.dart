@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_gallery/blocs/photo_preview_bloc.dart';
 import 'package:photo_gallery/models/photos_list_response.dart';
+import 'package:photo_gallery/models/wallpaper.dart';
 import 'package:photo_gallery/network/api_response.dart';
 import 'package:photo_gallery/utils/utility.dart';
 import 'package:photo_gallery/widgets/loader_dialog.dart';
@@ -37,11 +41,12 @@ class _PhotoPreviewScreenState extends State<PhotoPreviewScreen> {
     _currentIndex = index;
     _pageController = PageController(initialPage: index);
 
-    _bloc.photoShareStream.listen((event) {
+    _bloc.loaderStream.listen((event) {
       if (event.status == Status.loading) {
         DialogBuilder(context).showLoader();
       } else if (event.status == Status.completed) {
         DialogBuilder(context).hideLoader();
+        showSnackBar(context, event.data);
       } else if (event.status == Status.error) {
         DialogBuilder(context).hideLoader();
         showSnackBar(context, event.message, true);
@@ -67,7 +72,9 @@ class _PhotoPreviewScreenState extends State<PhotoPreviewScreen> {
         );
       },
       loadingBuilder: (context, event) {
-        return showLoader(context);
+        return CupertinoActivityIndicator(
+          color: Theme.of(context).colorScheme.secondary,
+        );
       },
       onPageChanged: (index) {
         _currentIndex = index;
@@ -82,19 +89,41 @@ class _PhotoPreviewScreenState extends State<PhotoPreviewScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           PhotoPreviewActionButton(
-            iconData: Icons.share,
+            iconData: Platform.isIOS ? CupertinoIcons.share : Icons.share,
             onPressed: () {
               if (photoList[_currentIndex].downloadUrl != null) {
                 _bloc.sharePhoto(photoList[_currentIndex].downloadUrl!);
               }
             },
           ),
-          PhotoPreviewActionButton(
-            iconData: Icons.photo,
-            onPressed: () {
-              // todo set photo as wallpaper
-            },
-          ),
+          if (Platform.isAndroid)
+            PhotoPreviewActionButton(
+              iconData: Icons.photo,
+              onPressed: () {
+                if (photoList[_currentIndex].downloadUrl != null) {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (BuildContext bc) {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: 3,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text(wallpaperModes[index].names),
+                            tileColor: Colors.grey[800],
+                            textColor: Theme.of(context).colorScheme.secondary,
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              _bloc.setWallpaper(photoList[_currentIndex].downloadUrl!, wallpaperModes[index]);
+                            },
+                          );
+                        },
+                      );
+                    },
+                  );
+                }
+              },
+            ),
         ],
       ),
     );
@@ -103,9 +132,6 @@ class _PhotoPreviewScreenState extends State<PhotoPreviewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Photo Gallery'),
-      ),
       body: Stack(
         children: [
           photoView(),

@@ -61,23 +61,22 @@ class _LoadingIndicatorState extends State<LoadingIndicator> {
     );
   }
 
-  Container _getLoadingIndicator() {
-    return Container(
-      padding: const EdgeInsets.only(bottom: 16),
-      width: 32,
-      height: 32,
+  Widget _getLoadingIndicator() {
+    return SizedBox(
+      width: 16,
+      height: 16,
       child: Platform.isIOS
           ? CupertinoActivityIndicator(color: Theme.of(context).colorScheme.secondary)
           : CircularProgressIndicator(
-              strokeWidth: 2.5,
+              strokeWidth: 1.5,
               color: Theme.of(context).colorScheme.secondary,
             ),
     );
   }
 
-  Padding _getHeader() {
+  Widget _getHeader() {
     return const Padding(
-      padding: EdgeInsets.only(bottom: 4),
+      padding: EdgeInsets.only(top: 8.0),
       child: Text(
         'Please wait',
         style: TextStyle(
