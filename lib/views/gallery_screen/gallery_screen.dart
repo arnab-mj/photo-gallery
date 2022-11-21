@@ -91,14 +91,24 @@ class _GalleryScreenState extends State<GalleryScreen> {
     );
   }
 
+  AppBar appBar() {
+    return AppBar(
+      backgroundColor: Colors.grey[900],
+      centerTitle: true,
+      title: const Text(
+        'Photo Gallery',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 16,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Photo Gallery',
-        ),
-      ),
+      appBar: appBar(),
       body: rootWidget(),
     );
   }
