@@ -19,12 +19,8 @@ class PhotoPreviewBloc extends BaseBloc {
     loaderSink.add(ApiResponse.loading());
 
     try {
-      if (await AppPermissionHandler().hasStoragePermission()) {
-        String response = await _repo.getPhoto(downloadUrl);
-        Share.shareXFiles([XFile(response)]);
-      } else {
-        throw ('Storage permission denied.');
-      }
+      String response = await _repo.getPhoto(downloadUrl);
+      Share.shareXFiles([XFile(response)]);
 
       loaderSink.add(ApiResponse.completed({}));
     } catch (e) {
@@ -36,14 +32,8 @@ class PhotoPreviewBloc extends BaseBloc {
     loaderSink.add(ApiResponse.loading());
 
     try {
-      String response;
-      if (await AppPermissionHandler().hasStoragePermission()) {
-        response = await _repo.getPhoto(downloadUrl);
-
-        await WallpaperManager.setWallpaperFromFile(response, wallpaperMode.value);
-      } else {
-        throw ('Storage permission denied.');
-      }
+      String response = await _repo.getPhoto(downloadUrl);
+      await WallpaperManager.setWallpaperFromFile(response, wallpaperMode.value);
 
       loaderSink.add(ApiResponse.completed('Wallpaper applied successfully.'));
     } catch (e) {
